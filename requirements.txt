@@ -2,4 +2,5 @@ Flask
 Jinja2
 pytest
 pyyaml
+markdown
 google-cloud-aiplatform

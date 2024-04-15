@@ -1,8 +1,11 @@
 from flask import Flask, render_template, request
+import markdown
 import os
 import yaml
 import vertexai
 from vertexai.language_models import TextGenerationModel
+from vertexai.generative_models import (GenerativeModel, GenerationConfig, 
+                                        Image, Part, FinishReason)
 
 app = Flask(__name__)
 
@@ -28,21 +31,53 @@ TOP_P = get_config_value(config, 'palm', 'top_p', 0.8)
 TOP_K = get_config_value(config, 'palm', 'top_k', 40)
 
 
-
 @app.route("/", methods = ['POST', 'GET'])
 def main():
     if request.method == 'POST':
         input = request.form['input']
-        response = get_response(input)
+        model = request.form['submit']
+
+        if (model == "Gemini"):
+            response = get_response_gemini(input) 
+        else:
+            response = get_response_palm(input)
     else: 
         input = ""
-        response = get_response("Who are you and what can you do?")
-
+        response = get_response_gemini("Who are you and what can you do?")
+    
+    response = markdown.markdown(response)
     model = {"title": TITLE, "subtitle": SUBTITLE, "botname": BOTNAME, "message": response, "input": input}
     return render_template('index.html', model=model)
 
 
-def get_response(input):
+def get_response_gemini(input):
+    vertexai.init(location="us-central1")
+
+    generationConfig = GenerationConfig(
+      temperature=TEMPERATURE,
+      top_k=TOP_K,
+      top_p=TOP_P,
+      max_output_tokens=MAX_OUTPUT_TOKENS
+    )
+
+    prompt = """{0}.
+    
+    input: {1}
+    output:
+    """.format(CONTEXT, input)
+    
+    model = GenerativeModel("gemini-1.0-pro-002")
+    response = model.generate_content(
+      [prompt],
+      generation_config=generationConfig,
+      stream=False,
+    )
+
+    return response.text
+    
+
+
+def get_response_palm(input):
     vertexai.init(location="us-central1")
     parameters = {
         "temperature": TEMPERATURE,
