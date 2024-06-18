@@ -23,12 +23,9 @@ with open('config.yaml') as f:
 
 TITLE = get_config_value(config, 'app', 'title', 'Ask Google')
 SUBTITLE = get_config_value(config, 'app', 'subtitle', 'Your friendly Bot')
-CONTEXT = get_config_value(config, 'palm', 'context', 'You are a bot who can answer all sorts of questions')
-BOTNAME = get_config_value(config, 'palm', 'botname', 'Google')
-TEMPERATURE = get_config_value(config, 'palm', 'temperature', 0.8)
-MAX_OUTPUT_TOKENS = get_config_value(config, 'palm', 'max_output_tokens', 256)
-TOP_P = get_config_value(config, 'palm', 'top_p', 0.8)
-TOP_K = get_config_value(config, 'palm', 'top_k', 40)
+CONTEXT = get_config_value(config, 'genai', 'context', 'You are a bot who can answer all sorts of questions')
+BOTNAME = get_config_value(config, 'genai', 'botname', 'Google')
+TEMPERATURE = get_config_value(config, 'genai', 'temperature', 0.8)
 
 
 @app.route("/", methods = ['POST', 'GET'])
@@ -52,21 +49,19 @@ def main():
 
 def get_response_gemini(input):
     vertexai.init(location="us-central1")
-
+    
     generationConfig = GenerationConfig(
       temperature=TEMPERATURE,
-      top_k=TOP_K,
-      top_p=TOP_P,
-      max_output_tokens=MAX_OUTPUT_TOKENS
     )
 
+    model = GenerativeModel("gemini-1.5-flash-001")
+
     prompt = """{0}.
-    
+
     input: {1}
     output:
     """.format(CONTEXT, input)
     
-    model = GenerativeModel("gemini-1.0-pro-002")
     response = model.generate_content(
       [prompt],
       generation_config=generationConfig,
@@ -78,15 +73,18 @@ def get_response_gemini(input):
 
 
 def get_response_palm(input):
+
+    # In the PaLM API, Temperature is between 0.0 and 1.0
+    global TEMPERATURE
+    if TEMPERATURE > 1.0: 
+      TEMPERATURE = 1.0
+
     vertexai.init(location="us-central1")
     parameters = {
         "temperature": TEMPERATURE,
-        "max_output_tokens": MAX_OUTPUT_TOKENS,
-        "top_p": TOP_P,
-        "top_k": TOP_K
     }
 
-    model = TextGenerationModel.from_pretrained("text-bison@001")
+    model = TextGenerationModel.from_pretrained("text-bison")
     request = """{0}.
     
     input: {1}

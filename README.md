@@ -1,6 +1,6 @@
-# PaLM API Text demo
+# Gemini API Flask App Demo
 
-This demo is a Python Flask web app that uses the Google PaLM API for generative AI.
+This demo is a Python Flask web app that uses the Google Gemini API for generative AI.
 
 ## To Run
 1. Clone the repo
@@ -8,8 +8,8 @@ This demo is a Python Flask web app that uses the Google PaLM API for generative
 
 ```
 pip install virtualenv
-virtualenv ~/palm-env
-source ~/palm-env/bin/activate
+virtualenv ~/genai-virtual-env
+source ~/genai-virtual-env/bin/activate
 ```
 
 3. Use Pip to install the prequisites
@@ -39,15 +39,8 @@ palm:
   botname: "CoffeeBot"
   context: "Your name is CoffeeBot. You are a barista and expert on all things related to coffee and tea."
   temperature: 0.8
-  max_output_tokens: 1024
-  top_p: 0.8
-  top_k: 40
 ```
 
-The variables temperature, top_p, and top_k essentially control how creative the model will be when answering. Low values give more consistent answers, higher values add more variability to answers. 
+The variable temperature controls how creative (random) the model will be when answering. Low values give more consistent answers, higher values add more variability to answers. 
 
-temperature is in the range 0.0 to 1.0
-top_p is in the range 0.0 to 1.0
-top_k is in the range 1 to 40
-
-max_output_tokens does just what the name implies. It is in the range 1 to 1024.
+temperature is in the range 0.0 to 2.0. (For older models it was between 0.0 and 1.0)

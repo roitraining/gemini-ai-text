@@ -1,12 +1,6 @@
 pip install virtualenv
-virtualenv ~/palm-env
-source ~/palm-env/bin/activate
+virtualenv ~/genai-virtual-env
+source ~/genai-virtual-env/bin/activate
 
-# Change to the folder where your progam is. 
+# Change to the folder where your progam is and then run: 
 pip install -r requirements.txt
-
-
-# To build the image
-gcloud builds submit --tag=gcr.io/vertext-ai-dar/mixabot:v0.2 .
-
-
